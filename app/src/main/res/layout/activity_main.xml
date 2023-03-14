@@ -20,7 +20,7 @@
         android:onClick="operadorEvent"
         android:inputType="textPersonName"
         android:layout_marginBottom="1pt"
-        android:text="0"
+        android:text=""
         android:textSize="40pt" />
 
     <TableLayout

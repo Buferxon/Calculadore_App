@@ -4,13 +4,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import com.example.calculadore_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     lateinit var text : TextView
 
-
+    var result = 0.0
     var isNewOP=true
     var oldNumber=""
     var op="+"
@@ -24,8 +25,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun numberEvent (View: View){
-        if(isNewOP)
+        if (text.text.toString()=="0.0")
             text.setText("")
+        val text1 = text.text.toString()
+        if(isNewOP)
+            text.setText(text1)
         isNewOP=false
         var buclik:String= text.text.toString()
         var buselect:Button=View as Button
@@ -48,29 +52,62 @@ class MainActivity : AppCompatActivity() {
 
     fun operadorEvent(view: View){
         isNewOP=true
+        val text1 = text.text.toString()
         oldNumber=text.text.toString()
         var buselect:Button= view as Button
         when(buselect.id){
-            R.id.buMultypli->{op="*"}
-            R.id.buPlus->{op="+"}
-            R.id.buMinus->{op="-"}
-            R.id.buDivide->{op="/"}
+            R.id.buMultypli->{op="*"
+                val newText = text1.plus("*" as CharSequence)
+                text.setText(newText)}
+            R.id.buPlus->{op="+"
+                val newText = text1.plus("+" as CharSequence)
+                text.setText(newText)}
+            R.id.buMinus->{op="-"
+                val newText = text1.plus("-" as CharSequence)
+                text.setText(newText)}
+            R.id.buDivide->{op="/"
+                val newText = text1.plus("/" as CharSequence)
+                text.setText(newText)}
         }
     }
     fun equalEvent(view: View){
-        var newnumber= text.text.toString()
-        var result =0.0
-        when(op){
-            "+" -> {result =oldNumber.toDouble() + newnumber.toDouble()}
-            "*" -> {result =oldNumber.toDouble() * newnumber.toDouble()}
-            "-" -> {result =oldNumber.toDouble() - newnumber.toDouble()}
-            "/" -> {result =oldNumber.toDouble() / newnumber.toDouble()}
+        result = result
+        val operators = listOf("+", "-", "*", "/")
+        val newnumber= text.text.toString()
+        val res=(text.text.isNotEmpty() && operators.any { newnumber.contains(it) }) &&result==0.0
+        if(res){
+
+            when (op){
+                "+" -> {
+                    val n1=newnumber.split("+")
+                    val newn= n1[1].trim()
+                    result = oldNumber.toDouble() + newn.toDouble()
+                }
+                "*" -> {
+                    val n1=newnumber.split("*")
+                    val newn= n1[1].trim()
+                    result = oldNumber.toDouble() * newn.toDouble()
+                }
+                "-" -> {
+                    val n1=newnumber.split("-")
+                    val newn= n1[1].trim()
+                    result = oldNumber.toDouble() - newn.toDouble()
+                }
+                "/" -> {
+                    val n1 = newnumber.split("/")
+                    val newn = n1[1].trim()
+                    result = oldNumber.toDouble() / newn.toDouble()
+                }
+            }
+            text.setText(result.toString())
+        }else{
+
         }
-        text.setText(result.toString())
     }
     fun acEvent(view: View){
-        text.setText("0")
+        text.setText("")
         isNewOP=true
+        result=0.0
     }
     fun percentEvent(view: View){
         var no= text.text.toString().toDouble()/100
