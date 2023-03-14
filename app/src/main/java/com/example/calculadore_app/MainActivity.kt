@@ -3,6 +3,8 @@ package com.example.calculadore_app
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -34,9 +36,6 @@ class MainActivity : AppCompatActivity() {
     fun numberEvent (View: View){
         if (text.text.toString()=="0.0")
             text.setText("")
-        val text1 = text.text.toString()
-        if(isNewOP)
-            text.setText(text1)
         isNewOP=false
         var buclik:String= text.text.toString()
         var buselect:Button=View as Button
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         val text1 = text.text.toString()
         oldNumber=text1.toString()
-        var buselect:Button= view as Button
+        val buselect:Button= view as Button
         when(buselect.id){
             R.id.buMultypli->{op="*"
                 val newText = text1.plus("*" as CharSequence)
@@ -80,42 +79,35 @@ class MainActivity : AppCompatActivity() {
     }
     fun equalEvent(view: View){
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        val operators1 = "+-*/"
         val operators = listOf("+", "-", "*", "/")
         val newnumber= text.text.toString()
-        val res=text.text.isNotEmpty()
-        val n1 = newnumber.split(operators.find { newnumber.contains(it) } ?: "")
-        val pattern = "[0-9]+[+\\-*\\/][0-9]+".toRegex()
-        val hasTwoNumbers = pattern.containsMatchIn(newnumber)
-        if(res && n1[1]!="" && hasTwoNumbers && n1[1].toDoubleOrNull()!=null){
 
-            when (op){
-                "+" -> {
-                    val newn= n1[1].trim()
-                    result = oldNumber.toDouble() + newn.toDouble()
-                }
-                "*" -> {
-                    val newn= n1[1].trim()
-                    result = oldNumber.toDouble() * newn.toDouble()
-                }
-                "-" -> {
+        val hasValidInput = newnumber.count { it in operators1 } == 1
+                && "[0-9]+(?:\\.[0-9]+)?[+\\-*\\/][0-9]+(?:\\.[0-9]+)?".toRegex().matches(newnumber)
+        if(hasValidInput){
+            val newn = newnumber.split(operators.find { newnumber.contains(it) } ?: "")
+                .last()
+                .trim()
 
-                    val newn= n1[1].trim()
-                    result = oldNumber.toDouble() - newn.toDouble()
-                }
-                "/" -> {
-
-                    val newn = n1[1].trim()
-                    result = oldNumber.toDouble() / newn.toDouble()
-                }
-
+            result= when (op) {
+                "+" -> oldNumber.toDouble() + newn.toDouble()
+                "*" -> oldNumber.toDouble() * newn.toDouble()
+                "-" -> oldNumber.toDouble() - newn.toDouble()
+                "/" -> oldNumber.toDouble() / newn.toDouble()
+                else -> oldNumber.toDouble()
             }
-            text.setText(result.toString())
-            res1 = true
+            text.setText((Math.round(result * 100) / 100.0).toString())
         }else{
             vibrator.vibrate(longArrayOf(0, 100, 100, 100), -1)
-            Toast.makeText(this, "Entrada inválida", Toast.LENGTH_SHORT).show()
+            val mensaje=Toast.makeText(this, "Entrada inválida", Toast.LENGTH_SHORT)
+            mensaje.show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                mensaje.cancel()
+            }, 500)
         }
     }
+
     fun acEvent(view: View){
         text.setText("")
         isNewOP=true
