@@ -8,9 +8,10 @@ import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import com.example.calculadore_app.databinding.ActivityMainBinding
+
 import android.os.Vibrator
 import android.widget.Toast
+import com.example.calculadore_app.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
@@ -116,9 +117,9 @@ class MainActivity : AppCompatActivity() {
     fun percentEvent(view: View){
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         var no= text.text.toString()
-        val hasMultiplication = no.contains("*")
+        val patron = """^\d+(\.\d+)?\*\d+(\.\d+)?$""".toRegex().matches(no)
         val n1=no.split("*")
-        if(hasMultiplication && n1[1]!="") {
+        if(patron && n1[1]!="") {
             val result = n1[0].toDouble() * n1[1].toDouble() / 100
             text.setText(result.toString())
         }else{
