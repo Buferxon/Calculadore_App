@@ -16,6 +16,7 @@
         android:layout_weight="1"
         android:background="@color/gray"
         android:ems="10"
+        android:editable="false"
         android:gravity="right|center"
         android:onClick="operadorEvent"
         android:inputType="textPersonName"
@@ -32,7 +33,7 @@
             android:layout_marginBottom="1pt"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <Button
+                <Button
                 android:id="@+id/buAC"
                 android:layout_width="30pt"
                 android:layout_height="30pt"

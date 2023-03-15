@@ -1,27 +1,34 @@
 package com.example.calculadore_app
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import com.example.calculadore_app.databinding.ActivityMainBinding
+import android.os.Vibrator
+import android.widget.Toast
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var text : TextView
-
     var result = 0.0
     var isNewOP=true
     var oldNumber=""
     var op="+"
+    var res1=false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val enlace= ActivityMainBinding.inflate(layoutInflater)
+        val enlace = ActivityMainBinding.inflate(layoutInflater)
         text=enlace.editText
-
+        text.isFocusable = false
+        text.isFocusableInTouchMode = false
+        text.isEnabled = false
         setContentView(enlace.root)
         //setContentView(R.layout.activity_main)
+
     }
 
     fun numberEvent (View: View){
@@ -51,9 +58,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun operadorEvent(view: View){
-        isNewOP=true
+
         val text1 = text.text.toString()
-        oldNumber=text.text.toString()
+        oldNumber=text1.toString()
         var buselect:Button= view as Button
         when(buselect.id){
             R.id.buMultypli->{op="*"
@@ -69,39 +76,44 @@ class MainActivity : AppCompatActivity() {
                 val newText = text1.plus("/" as CharSequence)
                 text.setText(newText)}
         }
+        isNewOP=false
     }
     fun equalEvent(view: View){
-        result = result
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         val operators = listOf("+", "-", "*", "/")
         val newnumber= text.text.toString()
-        val res=(text.text.isNotEmpty() && operators.any { newnumber.contains(it) }) &&result==0.0
-        if(res){
+        val res=text.text.isNotEmpty()
+        val n1 = newnumber.split(operators.find { newnumber.contains(it) } ?: "")
+        val pattern = "[0-9]+[+\\-*\\/][0-9]+".toRegex()
+        val hasTwoNumbers = pattern.containsMatchIn(newnumber)
+        if(res && n1[1]!="" && hasTwoNumbers && n1[1].toDoubleOrNull()!=null){
 
             when (op){
                 "+" -> {
-                    val n1=newnumber.split("+")
                     val newn= n1[1].trim()
                     result = oldNumber.toDouble() + newn.toDouble()
                 }
                 "*" -> {
-                    val n1=newnumber.split("*")
                     val newn= n1[1].trim()
                     result = oldNumber.toDouble() * newn.toDouble()
                 }
                 "-" -> {
-                    val n1=newnumber.split("-")
+
                     val newn= n1[1].trim()
                     result = oldNumber.toDouble() - newn.toDouble()
                 }
                 "/" -> {
-                    val n1 = newnumber.split("/")
+
                     val newn = n1[1].trim()
                     result = oldNumber.toDouble() / newn.toDouble()
                 }
+
             }
             text.setText(result.toString())
+            res1 = true
         }else{
-
+            vibrator.vibrate(longArrayOf(0, 100, 100, 100), -1)
+            Toast.makeText(this, "Entrada inválida", Toast.LENGTH_SHORT).show()
         }
     }
     fun acEvent(view: View){
@@ -110,8 +122,17 @@ class MainActivity : AppCompatActivity() {
         result=0.0
     }
     fun percentEvent(view: View){
-        var no= text.text.toString().toDouble()/100
-        text.setText(no.toString())
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        var no= text.text.toString()
+        val hasMultiplication = no.contains("*")
+        val n1=no.split("*")
+        if(hasMultiplication && n1[1]!="") {
+            val result = n1[0].toDouble() * n1[1].toDouble() / 100
+            text.setText(result.toString())
+        }else{
+            vibrator.vibrate(longArrayOf(0, 100, 100, 100), -1)
+            Toast.makeText(this, "Entrada inválida", Toast.LENGTH_SHORT).show()
+        }
         isNewOP=true
     }
 }
